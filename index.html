@@ -1,0 +1,401 @@
+<!doctype html>  
+<html lang="en">
+	
+	<head>
+		<meta charset="utf-8">
+		
+		<title>MongoDB in the Ruby Ecosystem</title>
+
+		<meta name="description" content="Overview of the driver, advantages, and various object mappers for RubyConf Brazil 2012">
+		<meta name="author" content="Tyler Brock">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		
+		<link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+		
+		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" href="css/theme/default.css">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<script>
+			// If the query includes 'print-pdf' we'll use the PDF print sheet
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+	
+	<body>
+		
+		<div class="reveal">
+			<img class="logo" src="img/logo.png"></img>
+
+			<!-- Used to fade in a background when a specific slide state is reached -->
+			<div class="state-background"></div>
+			
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>MongoDB in the Ruby Ecosystem</h1>
+          			<small><a href="http://www.twitter.com/TylerBrock">@TylerBrock</a></small>
+				</section>
+
+				<section data-state=>
+		          <h1>Agenda</h1>
+
+		          <p>MongoDB</p>
+		          <p>Ruby Driver</p>
+		          <p>Object Document Mappers</p>
+				</section>
+				
+        		<section>
+        			<h1>MongoDB</h1>
+					<section>
+						<h5>A Datastore</h5>
+						<p>Open Source</p>
+		            	<p>Document Oriented</p>		
+		            	<p>Scalable</p>
+		            	<p>Performant</p>
+							<a href="http://www.mongodb.org/downloads" class="image">
+								<img width="75" height="75" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
+							</a>
+	         		</section>
+
+	         		<section>
+	         			<h5>Open Source</h5>
+
+	         			<p><span class="blue">Database</span> released under <span class="red">AGPL</span> License</p>
+	         			<p><span class="blue">Drivers</span> realeased under <span class="red">Apache</span> License</p>
+
+	         			<img src="img/github.png"></img>
+	         		</section>
+
+	         		<section>
+	         			<h5>Document Oriented</h5>
+            			<pre><code>
+var user = {
+  name: "Tyler Brock",
+  age: 27,
+  langs: ["Ruby", "JavaScript"],
+  addresses: {
+    color: "Blue",
+    number: 12,
+    movies: ["Die Hard", "Inception"],
+    drinks: ["Guaraná Antarctica"]
+  }
+}
+            			</code></pre>
+	         		</section>
+
+	         		<section>
+	         			<h5>Highly Performant</h5>
+            			<ul>
+            				<li>Data Locality</li>
+            				<li>Fire and Forget Writes</li>
+            				<li>BSON</li>
+            			</ul>
+	         		</section>
+
+	         		<section>
+	         			<h5>Scalable</h5>
+            			<ul>
+            				<li>Replica Sets</li>
+            				<li>Sharded Clusters</li>
+            			</ul>
+	         		</section>
+
+	         		<section>
+	         			<img src="img/landscape.png" height="400" width="600" style="border:0px"></img>
+	         			<h5>Database Landscape</h5>
+	         		</section>
+
+	         		<section>
+	         			<small>with</small>
+	         			<h2>Ruby?</h2>
+	         		</section>
+	         	</section>
+
+	         	<section>
+	         		<h1>MongoDB + Ruby</h1>
+	         		<section>
+						<img height="400" width="300" src="img/matz.jpg"></img>
+						<p>Matz</p>
+					</section>
+					<section>
+						<blockquote>
+							Ruby is designed to be human-oriented.
+							It reduces the burden of programming.
+							It tries to push jobs back to machines. You can accomplish
+							more tasks with less work, in smaller yet readable code.
+						</blockquote>
+						<small><i>Yukihiro Matsumoto</i></small>
+					</section>
+
+	         		<section>
+						<blockquote>MongoDB is a database for programmers</blockquote>
+						<small><i>Tyler Brock</i></small>
+					</section>
+
+	         		<section>
+	         			<h5>Data vs. Objects</h5>
+						<p class = "fragment">Relational databases store and query <span class="red">data</span></p>
+						<p class = "fragment">Programmers work with <span class="blue">objects</span></p>
+						<p class = "fragment">Everything in Ruby is an object</p>
+						<p class = "fragment">Why not use a tool that was designed to work with objects?</p>
+					</section>
+        		</section>
+
+        		<section>	
+          			<h1>Ruby Driver</h1>
+          			
+          			<section>
+            			<h5>Connect</h5>
+            			<pre><code>
+@connection = Mongo::Connection.new("localhost", 27017)
+@data       = @connection.db("data")
+@users      = @data.collection("users")
+            			</pre></code>
+            		</section>
+
+          			<section>
+            			<h5>Insert</h5>
+            			<pre><code>
+tyler = {
+  :name => "Tyler",
+  :age  => 27,
+  :langs => ["Ruby", "JavaScript"],
+  :addresses => {
+    :color => "Blue",
+    :number => 12,
+    :movies => ["Die Hard", "Inception"],
+    :drinks => ["Guaraná Antarctica"]
+  }
+}
+
+@users.insert(tyler)
+            			</pre></code>
+          			</section>
+          			
+          			<section>
+            			<h5>Query</h5>
+            			<pre><code>
+@users.find({ :name => "Tyler" })
+@users.find({ :age  => { "$lt" => 30 } })
+
+@users.find({
+  :age             => { "$lt" => 30 },
+  :langs           => "Ruby",
+  "favorite.color" => "Blue"
+})
+            			</pre></code>
+            		</section>
+
+            		<section>
+            			<h5>Update</h5>
+            			<pre><code>
+tyler = @users.find_one({ :name => "Tyler" })
+tyler.langs << "C++"
+@users.save(tyler)
+          				</pre></code>
+            			<h5>Atomic Update</h5>
+            			<pre><code>
+@users.update(
+  { :name => "Tyler" },              # find matching document
+  { :$push => { :langs => "C++" } }  # update it this way
+)
+          				</pre></code>
+          			</section>
+
+          			<section>
+            			<h5>Sorting</h5>
+            			<pre><code>
+@users.find.sort(:age => :desc)
+@users.find.sort({ 
+  :age => :desc,
+  :name => :asc
+})
+            			</pre></code>
+            
+            			<h5>Indexing</h5>
+            			<pre><code>
+@users.create_index( [[:age, -1], [:name, 1]] )
+          				</pre></code>
+          			</section>
+
+          			<section>
+            			<h5>Replica Set</h5>
+            			<pre><code contenteditable>
+Mongo::ReplSetConnection.new([
+  'localhost:3000', 'localhost:3001', 'localhost:3002'
+])
+            			</pre></code>
+            
+            			<h5>Sharded Cluster</h5>
+            			<pre><code contenteditable>
+Mongo::ShardedConnection.new([
+  'localhost:3000', 'localhost:30001', 'localhost:3002'
+])
+          				</pre></code>
+          			</section>
+
+          			<section>
+						<img src="img/rubyconc.png"></img>
+						<h5>Concurrency in Ruby</h5>
+					</section>
+        		</section>
+
+				<section>
+					<h1>Object Document Mappers</h1>
+				</section>
+				
+				<section>
+          			<h2>Mongoid</h2>
+          			<section>
+          				<pre><code class="ruby">
+class Post
+  include Mongoid::Document
+  field :title, type: String
+  field :body, type: String
+  field :tags, type: Array
+
+  has_many :comments
+end
+
+class Comment
+  include Mongoid::Document
+  field :comment, type: String
+
+  belongs_to :posts
+end
+          				</pre></code>
+					</section>
+
+          			<section>
+          				<pre><code class="ruby">
+# The parent Post document.
+{
+  "_id": ObjectId("4d3ed089fb60ab534684b7e9"),
+  "title": "How the Internets were Won",
+  "body": "One day Tim Berners Lee...",
+  "tags": ["Internet", "Cool", "Adventure"]
+}
+
+# The child Comment document.
+{
+  "_id": ObjectId("4d3ed089fb60ab534684b7f1"),
+  "comment": "Boring!" 
+  "post_id": ObjectId("4d3ed089fb60ab534684b7e9")
+}
+          				</pre></code>
+					</section>
+          			<section>
+          				<pre><code class="ruby">
+class Post
+  include Mongoid::Document
+  field :title, type: String
+  field :body,  type: String
+  field :tags,  type: Array
+
+  embeds_many :comments
+end
+
+class Comment
+  include Mongoid::Document
+  field :comment, type: String
+
+  embedded_in :posts
+end
+          				</pre></code>
+					</section>
+
+          			<section>
+          				<pre><code class="ruby">
+{
+  "_id": ObjectId("4d3ed089fb60ab534684b7e9"),
+  "title": "How the Internets were Won",
+  "body": "One day Tim Berners Lee...",
+  "tags": ["Internet", "Cool", "Adventure"]
+  "comments": [
+    {
+      "_id": ObjectId("4d3ed089fb60ab534684b7e0"),
+      "comment": "Boring!" 
+    }
+  ]
+}
+          				</pre></code>
+					</section>
+				</section>
+				
+				<section>
+          			<h2>MongoMapper</h2>
+          			<pre><code class="ruby">
+class Post
+  include MongoMapper::Document
+
+  key :title, String
+  key :body,  String
+  key :tags,  Array
+
+  many :comments
+end
+
+
+class Comment
+  include MongoMapper::EmbeddedDocument
+
+  key :comment, String
+end
+          			</pre></code>
+				</section>
+				<section>
+					<h1>Thanks!</h1>
+				</section>
+			</div>
+
+			<!-- The navigational controls UI -->
+			<aside class="controls">
+				<a class="left" href="#">&#x25C4;</a>
+				<a class="right" href="#">&#x25BA;</a>
+				<a class="up" href="#">&#x25B2;</a>
+				<a class="down" href="#">&#x25BC;</a>
+			</aside>
+
+			<!-- Presentation progress bar -->
+			<div class="progress"><span></span></div>
+			
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+			
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: false,
+				progress: true,
+				history: true,
+				
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/linear(2d)
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/highlight.js', async: true, callback: function() { window.hljs.initHighlightingOnLoad(); } },
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'lib/js/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'lib/js/data-markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'socket.io/socket.io.js', async: true, condition: function() { return window.location.host === 'localhost:1947'; } },
+					{ src: 'plugin/speakernotes/client.js', async: true, condition: function() { return window.location.host === 'localhost:1947'; } },
+				]
+			});
+			
+		</script>
+
+	</body>
+</html>
