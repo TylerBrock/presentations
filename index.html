@@ -43,6 +43,11 @@
 				<section>
 					<h1>MongoDB in the Ruby Ecosystem</h1>
           			<small><a href="http://www.twitter.com/TylerBrock">@TylerBrock</a></small>
+          			<br/>
+          			<br/>
+          			<br/>
+          			<p>Available Live</p>
+          			<p><small>tylerbrock.github.com/rubyconf-brazil</small></p>
 				</section>
 
 				<section data-state=>
@@ -56,13 +61,9 @@
         		<section>
         			<h1>MongoDB</h1>
 					<section>
-						<h5>A Datastore</h5>
-						<p>Open Source</p>
-		            	<p>Document Oriented</p>		
-		            	<p>Scalable</p>
-		            	<p>Performant</p>
+						<h5>It's an open source, document oriented, highly performant, scalable database</h5>
 							<a href="http://www.mongodb.org/downloads" class="image">
-								<img width="75" height="75" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
+								<img src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
 							</a>
 	         		</section>
 
@@ -82,7 +83,7 @@ var user = {
   name: "Tyler Brock",
   age: 27,
   langs: ["Ruby", "JavaScript"],
-  addresses: {
+  favorites: {
     color: "Blue",
     number: 12,
     movies: ["Die Hard", "Inception"],
@@ -103,10 +104,14 @@ var user = {
 
 	         		<section>
 	         			<h5>Scalable</h5>
-            			<ul>
-            				<li>Replica Sets</li>
-            				<li>Sharded Clusters</li>
-            			</ul>
+	         			<img height="300" width="400" src="img/rs.png"></img>
+	         			<p><small>Replica Set</small><p>
+	         		</section>
+
+	         		<section>
+	         			<h5>Scalable</h5>
+	         			<img height="350" width="550" src="img/sharded.png"></img>
+	         			<p><small>Sharded Cluster</small></p>
 	         		</section>
 
 	         		<section>
@@ -180,17 +185,31 @@ tyler = {
 @users.insert(tyler)
             			</pre></code>
           			</section>
+
+          			<section>
+            			<h5>Bulk Insert</h5>
+            			<pre><code>
+people = [
+  { :name => "Tyler", 	age: 27, ... }
+  { :name => "Jessica", age: 30, ... }
+  { :name => "Jon", 	age: 27, ... },
+  ...
+]
+
+@users.insert(people)
+            			</pre></code>
+          			</section>
           			
           			<section>
             			<h5>Query</h5>
             			<pre><code>
-@users.find({ :name => "Tyler" })
-@users.find({ :age  => { "$lt" => 30 } })
+@users.find({ :name => "Tyler" })          # name = "Tyler"
+@users.find({ :age  => { "$lt" => 30 } })  # age < 30
 
 @users.find({
-  :age             => { "$lt" => 30 },
-  :langs           => "Ruby",
-  "favorite.color" => "Blue"
+  :age             => { "$lt" => 30 },     # ... AND ...
+  :langs           => "Ruby",              # look in array
+  "favorite.color" => "Blue"               # reach into object
 })
             			</pre></code>
             		</section>
@@ -200,16 +219,29 @@ tyler = {
             			<pre><code>
 tyler = @users.find_one({ :name => "Tyler" })
 tyler.langs << "C++"
-@users.save(tyler)
+@users.save(tyler)                   # too late?
           				</pre></code>
             			<h5>Atomic Update</h5>
             			<pre><code>
 @users.update(
-  { :name => "Tyler" },              # find matching document
-  { :$push => { :langs => "C++" } }  # update it this way
+  { :name => "Tyler" },              # query selector
+  { :$push => { :langs => "C++" } }  # update document
 )
           				</pre></code>
           			</section>
+
+          			<section>
+          				<h5>Atomic Modifiers</h5>
+          					<p>$inc, $set, $unset, $push, $pull, $pushAll, $pullAll, $rename, $pop, $addToSet, ...</p>
+          				<h5>Upsert</h5>
+          				<small>If we find a match, update, if not, merge and insert</small>
+          				<pre><code>
+@sites.update(
+  { :url => "http://www.locaweb.com.br" },
+  { :$inc => { :visits => 1 } },
+:upsert => true)
+						</pre></code>
+					</section>
 
           			<section>
             			<h5>Sorting</h5>
@@ -245,7 +277,7 @@ Mongo::ShardedConnection.new([
 
           			<section>
 						<img src="img/rubyconc.png"></img>
-						<h5>Concurrency in Ruby</h5>
+						<h5>Concurrency and Parallelism in Ruby</h5>
 					</section>
         		</section>
 
@@ -273,6 +305,7 @@ class Comment
   belongs_to :posts
 end
           				</pre></code>
+          				<h5>Blog Posts and Comments</h5>
 					</section>
 
           			<section>
@@ -292,6 +325,7 @@ end
   "post_id": ObjectId("4d3ed089fb60ab534684b7e9")
 }
           				</pre></code>
+          				<h5>Blog Posts and Comments (Stored)</h5>
 					</section>
           			<section>
           				<pre><code class="ruby">
@@ -311,10 +345,12 @@ class Comment
   embedded_in :posts
 end
           				</pre></code>
+          				<h5>Blog Posts and Embedded Comments</h5>
 					</section>
 
           			<section>
           				<pre><code class="ruby">
+# Post and Comment stored in single collection (together)
 {
   "_id": ObjectId("4d3ed089fb60ab534684b7e9"),
   "title": "How the Internets were Won",
@@ -328,6 +364,18 @@ end
   ]
 }
           				</pre></code>
+          				<h5>Blog Posts and Embedded Comments (Stored)</h5>
+					</section>
+					<section>
+						<h5>Validations at the ORM level</h5>
+						<pre><code class="ruby">
+class Comment
+...
+  validates_presence_of :title
+  validates_numericality_of :views
+...
+end
+						</pre></code>
 					</section>
 				</section>
 				
@@ -340,6 +388,10 @@ class Post
   key :title, String
   key :body,  String
   key :tags,  Array
+  key :views, Integer
+
+  validates_presence_of :title
+  validates_numericality_of :views
 
   many :comments
 end
@@ -354,6 +406,7 @@ end
 				</section>
 				<section>
 					<h1>Thanks!</h1>
+					<p><a href="http://www.github.com/tylerbrock/rubyconf-brazil">Code for Presentation</a></p>
 				</section>
 			</div>
 
